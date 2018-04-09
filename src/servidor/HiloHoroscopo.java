@@ -6,6 +6,8 @@
 package servidor;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -69,7 +71,7 @@ public class HiloHoroscopo implements Runnable {
     
 		
 	private boolean verificarExistencia(String horoscopo){
-		int longitud horoscopos.length, i=0;
+		int longitud  = horoscopos.length, i=0;
 		boolean encontrado = false;
 		while (i < longitud & !encontrado){
 			encontrado = horoscopos[i].equalsIgnoreCase(horoscopo);
@@ -85,7 +87,7 @@ public class HiloHoroscopo implements Runnable {
 			int numero = aleatorio.nextInt(); 
 			respuesta = predicciones[numero];
 			//Se cargan los valores de hash siempre en mayuscula
-			cacheHoroscopo.add(horoscopo.toUpperCase(),respuesta);
+			cacheHoroscopo.put(horoscopo.toUpperCase(),respuesta);
 		}
 		
 		return respuesta;
@@ -94,12 +96,17 @@ public class HiloHoroscopo implements Runnable {
     @Override
     public void run() {
 		String horoscopo;
-		horoscopo = in.readUTF();
-		if (!verificarExistencia(horoscopo)){
+        try {
+            horoscopo = in.readUTF();
+            if (!verificarExistencia(horoscopo)){
 			out.writeUTF("El horoscopo no existe");
 		}else{
 			out.writeUTF(retornarHoroscopo(horoscopo));
 		}
+        } catch (IOException ex) {
+            Logger.getLogger(HiloHoroscopo.class.getName()).log(Level.SEVERE, null, ex);
+        }
+		
     }
 	
 }

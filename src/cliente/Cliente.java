@@ -18,7 +18,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Date;
 
-
 public class Cliente {
 
     private final static int PORT = 20000;
@@ -39,29 +38,28 @@ public class Cliente {
                 in = new DataInputStream(serverSocket.getInputStream());
 
                 String userInput;
-              
+
                 menu = in.readUTF();
                 System.out.println(menu);
-                
-                
+
                 //leyendo teclado
-                while ((userInput = stdIn.readLine()) != null and !exit) {
+                while ((userInput = stdIn.readLine()) != null && !exit) {
                     if (userInput.equals("salir")) {
                         exit = true;
                     } else {
-                        
+
                         out.writeUTF(userInput);
-                        if(!(salida = in.readUTF()).equals("valido")){
+                        if (!(salida = in.readUTF()).equals("valido")) {
                             System.out.println(salida);
                             System.out.println(menu);
-                            
-                        }else{
-							//Tenia una , la secuencia
-							//leo la respuesta del servidor
-							salida = in.readUTF();
+
+                        } else {
+                            //Tenia una , la secuencia
+                            //leo la respuesta del servidor
+                            salida = in.readUTF();
                             System.out.println(salida);
                         }
-                        
+
                     }
                 }
 
@@ -78,9 +76,9 @@ public class Cliente {
             System.exit(1);
         }
     }
-    
-    public static void recibirMenu(BufferedReader in){
-        
+
+    public static void recibirMenu(BufferedReader in) {
+
     }
 
     public static int countLines(String str) {
@@ -94,8 +92,8 @@ public class Cliente {
         }
         return count;
     }
-    
-    public static void limpiarpantalla()  {
+
+    public static void limpiarpantalla() {
         Robot robot;
         try {
             robot = new Robot();
@@ -103,10 +101,10 @@ public class Cliente {
             robot.keyPress(KeyEvent.VK_L);
             robot.keyRelease(KeyEvent.VK_CONTROL);
             robot.keyRelease(KeyEvent.VK_L);
-            
+
         } catch (AWTException ex) {
             Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-}
+
+    }
 }

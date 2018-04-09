@@ -10,7 +10,7 @@ public class Servidor {
     
     public static void main(String args[]) throws IOException {
         HashMap<Date, String> cachePronostico = new HashMap<>();
-        HashMap<Integer, String> cacheHoroscopo = new HashMap<>();;
+        HashMap<Integer, String> cacheHoroscopo = new HashMap<>();
         ServerSocket ss;
         System.out.print("Inicializando servidor... ");
         try {
@@ -22,7 +22,7 @@ public class Servidor {
                 socket = ss.accept();
                 System.out.println("Nueva conexión entrante: "+socket);
                 //Creo un hilo y le envio un Runnable Servidor Menu
-                new Thread(new ServidorHiloMenu(socket,idSession,cachePronostico,cacheHoroscopo)).start();
+                new Thread(new ServidorHiloMenu(socket,idSession)).start();
                 idSession++;
             }
         } catch (IOException ex) {

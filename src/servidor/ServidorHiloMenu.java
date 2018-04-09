@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -28,13 +29,18 @@ public class ServidorHiloMenu implements Runnable {
     private DataOutputStream out;
     private DataInputStream in;
 
+    private HashMap<Date, String> cachePronostico ;
+    private HashMap<Integer, String> cacheHoroscopo ;
+
     private Socket socket;
     private int idSession;
 
-
-    public ServidorHiloMenu(Socket socket, int id) {
+    public ServidorHiloMenu(Socket socket, int id,
+            HashMap<Date, String> cachePronostico,HashMap<Integer, String> cacheHoroscopo ) {
         this.socket = socket;
         this.idSession = id;
+        this.cachePronostico = cachePronostico;
+        this.cacheHoroscopo = cacheHoroscopo;
         try {
             //inicializo buffers de lectura y escritura
             out = new DataOutputStream(socket.getOutputStream());
@@ -62,8 +68,7 @@ public class ServidorHiloMenu implements Runnable {
 
     private void enviarMenuDeOpciones() throws IOException {
         String outputLine;
-        int cantLineas;
-        outputLine = "Elegir un horoscopo seguido de una fecha separado por coma\npor ejemplo: rata,01/02/2017 donde la fecha tiene el formato DIA/MES/AÑO" ;
+        outputLine = "Elegir un horoscopo seguido de una fecha separado por coma donde la fecha tiene el formato DIA/MES/AÑO \npor ejemplo: rata,01/02/2017 ";
         out.writeUTF(outputLine);
     }
 
@@ -78,57 +83,96 @@ public class ServidorHiloMenu implements Runnable {
         }
         return count;
     }
-	
-	private String connexionHoroscopo(String horoscopo){
-		Socket serverSocket = null;
-		DataOutputStream outHoroscopo = null;
+
+    private DataInputStream connexionHoroscopo(String horoscopo) {
+        Socket serverSocket = null;
+        DataOutputStream outHoroscopo = null;
         DataInputStream inHoroscopo = null;
-		String respuesta = "error"  ;
-		try{
-			serverSocket = new Socket("localhost", 1000);
+        try {
+            serverSocket = new Socket("localhost", 1000);
             outHoroscopo = new DataOutputStream(serverSocket.getOutputStream());
             inHoroscopo = new DataInputStream(serverSocket.getInputStream());
-			//Le envio el horoscopo
-			outHoroscopo.writeUTF(horoscopo);
-			//espero la respuesta
-			respuesta = inHoroscopo.readUTF();
-			 
-		} catch (UnknownHostException e) {
+            //Le envio el horoscopo
+            outHoroscopo.writeUTF(horoscopo);
+            //espero la respuesta
+            //respuesta = inHoroscopo.readUTF();
+
+        } catch (UnknownHostException e) {
             System.err.println("Host desconocido");
             System.exit(1);
         } catch (IOException e) {
             System.err.println("No se puede conectar a localhost");
             System.exit(1);
         }
-		return respuesta;
-	}
+        return inHoroscopo;
+    }
+
+    private DataInputStream conexionClima(String fechaClima) {
+        Socket serverSocket = null;
+        DataOutputStream outClima = null;
+        DataInputStream inClima = null;
+        try {
+            serverSocket = new Socket("localhost", 2000);
+            outClima = new DataOutputStream(serverSocket.getOutputStream());
+            inClima = new DataInputStream(serverSocket.getInputStream());
+            //Le envio el horoscopo
+            outClima.writeUTF(fechaClima);
+            //espero la respuesta
+            //respuesta = inHoroscopo.readUTF();
+
+        } catch (UnknownHostException e) {
+            System.err.println("Host desconocido");
+            //System.exit(1);
+        } catch (IOException e) {
+            System.err.println("No se puede conectar a localhost");
+            //System.exit(1);
+        }
+        return inClima;
+    }
 
     @Override
     public void run() {
         String lineaEntrada, lineaSalida;
+        boolean listo = false;
+        DataInputStream inHoroscopo;
+        DataInputStream inClima;
         try {
             enviarMenuDeOpciones();
-            while ((lineaEntrada = in.readUTF()) != null) {
+            while ((lineaEntrada = in.readUTF()) != null && !listo) {
                 //leo la respuesta
-                if (lineaEntrada.contains(',')){
-					out.writeUTF("valido");
-					
-					String horoscopo,pronostico;
-					int posComa = lineaEntrada.indexOf(',');
-					
-					horoscopo = lineaEntrada.substring(0,posComa - 1);
-					pronostico = lineaEntrada.substring(posComa + 1);
-					
-					//Recorto los espacio en blanco
-					horoscopo = horoscopo.trim();
-					pronostico = pronostico.trim();
-					
-					//Generar conexion servidor horoscopo
-					connexionHoroscopo(horoscopo);
-					
-				}else{
-					lineaSalida = "Porfavor ingrese un horoscopo y un pronostico seguido por coma";
-				}
+                if (lineaEntrada.contains(",")) {
+                    out.writeUTF("valido");
+
+                    String horoscopo, pronostico;
+                    int posComa = lineaEntrada.indexOf(',');
+
+                    horoscopo = lineaEntrada.substring(0, posComa - 1);
+                    pronostico = lineaEntrada.substring(posComa + 1);
+
+                    //Recorto los espacio en blanco
+                    horoscopo = horoscopo.trim();
+                    pronostico = pronostico.trim();
+
+                    //Generar conexion servidor horoscopo
+                    inHoroscopo = connexionHoroscopo(horoscopo);
+                    inClima = conexionClima(pronostico);
+                    if (inHoroscopo != null) {
+                        out.writeUTF(inHoroscopo.readUTF());
+                    } else {
+                        out.writeUTF("Fallo conexion con el servidor horoscopo");
+                    }
+
+                    if (inClima != null) {
+                        out.writeUTF(inClima.readUTF());
+                    } else {
+                        out.writeUTF("Fallo conexion con el servidor clima");
+                    }
+
+                    listo = true;
+
+                } else {
+                    lineaSalida = "Porfavor ingrese un horoscopo y un pronostico seguido por coma";
+                }
 
             }
         } catch (IOException e) {

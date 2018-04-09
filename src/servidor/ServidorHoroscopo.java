@@ -8,7 +8,7 @@ import java.util.logging.*;
 
 public class ServidorHoroscopo {
 	
-	private final int PUERTO = 1000;
+	private static final int PUERTO = 1000;
     
     public static void main(String args[]) throws IOException {
         HashMap<String, String> cacheHoroscopo = new HashMap<>();;
