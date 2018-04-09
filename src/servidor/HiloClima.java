@@ -26,7 +26,12 @@ import java.util.Random;
  */
 public class HiloClima implements Runnable {
 
-    private HashMap<Date, String> cacheClima;
+    @Override
+    public void run() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+ /* private HashMap<Date, String> cacheClima;
 
     private DataOutputStream out;
     private DataInputStream in;
@@ -72,7 +77,7 @@ public class HiloClima implements Runnable {
 			encontrado = horoscopos[i].equalsIgnoreCase(horoscopo);
 			i++;
 		}
-		return encontrado;*/
+		return encontrado;
         return true;
     }
 
@@ -111,5 +116,5 @@ public class HiloClima implements Runnable {
             Logger.getLogger(HiloClima.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+*/
 }
