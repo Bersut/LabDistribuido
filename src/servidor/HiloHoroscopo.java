@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
@@ -23,7 +24,7 @@ import java.util.Random;
  */
 public class HiloHoroscopo implements Runnable {
 
-    private HashMap<String, String> cacheHoroscopo;
+    private ConcurrentHashMap<String, String> cacheHoroscopo;
 
     private DataOutputStream out;
     private DataInputStream in;
@@ -42,7 +43,7 @@ public class HiloHoroscopo implements Runnable {
         "Sigue participando"};
     
     
-    public HiloHoroscopo(Socket socket,int idSession,HashMap<String, String> cacheHoroscopo){
+    public HiloHoroscopo(Socket socket,int idSession,ConcurrentHashMap<String, String> cacheHoroscopo){
         
         this.socket = socket;
         this.idSession = idSession;
@@ -65,7 +66,7 @@ public class HiloHoroscopo implements Runnable {
             in.close();
             socket.close();
         } catch (IOException ex) {
-            Logger.getLogger(ServidorHiloMenu.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(HiloMenu.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -83,9 +84,9 @@ public class HiloHoroscopo implements Runnable {
 	private String retornarHoroscopo(String horoscopo){
 		String respuesta = cacheHoroscopo.get(horoscopo.toUpperCase());
 		if (respuesta == null){
-			Random aleatorio = new Random(predicciones.length);
-			int numero = aleatorio.nextInt(); 
-			respuesta = predicciones[numero];
+			Random aleatorio = new Random();
+			int numero = aleatorio.nextInt(predicciones.length); 
+			respuesta = predicciones[numero]; 
 			//Se cargan los valores de hash siempre en mayuscula
 			cacheHoroscopo.put(horoscopo.toUpperCase(),respuesta);
 		}
@@ -98,6 +99,7 @@ public class HiloHoroscopo implements Runnable {
 		String horoscopo;
         try {
             horoscopo = in.readUTF();
+            System.out.println(horoscopo);
             if (!verificarExistencia(horoscopo)){
 			out.writeUTF("El horoscopo no existe");
 		}else{

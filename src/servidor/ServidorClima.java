@@ -8,7 +8,7 @@ import java.util.logging.*;
 
 public class ServidorClima {
 	
-	private static final int PUERTO = 2000;
+	/*private static final int PUERTO = 2000;
     
     public static void main(String args[]) throws IOException {
         HashMap<Date, String> cacheClima = new HashMap<>();;
@@ -29,5 +29,5 @@ public class ServidorClima {
         } catch (IOException ex) {
             Logger.getLogger(Servidor.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
+    }*/
 }

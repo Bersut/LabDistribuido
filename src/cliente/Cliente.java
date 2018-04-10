@@ -42,16 +42,17 @@ public class Cliente {
                 menu = in.readUTF();
                 System.out.println(menu);
 
-                //leyendo teclado
-                while ((userInput = stdIn.readLine()) != null && !exit) {
+                //leyendo tecladoe
+                while (!exit && (userInput = stdIn.readLine()) != null) {
                     if (userInput.equals("salir")) {
+                        out.writeUTF("exit");
                         exit = true;
                     } else {
 
                         out.writeUTF(userInput);
                         if (!(salida = in.readUTF()).equals("valido")) {
+                            //La consulta posee algun error
                             System.out.println(salida);
-                            System.out.println(menu);
 
                         } else {
                             //Tenia una , la secuencia
@@ -59,14 +60,16 @@ public class Cliente {
                             salida = in.readUTF();
                             System.out.println(salida);
                         }
-
+                        System.out.println(menu);
                     }
                 }
 
             }
+            System.out.println("chau cliente");
             out.close();
             in.close();
             stdIn.close();
+
             serverSocket.close();
         } catch (UnknownHostException e) {
             System.err.println("Host desconocido");

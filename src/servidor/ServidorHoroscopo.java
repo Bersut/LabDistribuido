@@ -4,14 +4,15 @@ import java.io.*;
 import java.net.*;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.*;
 
 public class ServidorHoroscopo {
 	
-	private static final int PUERTO = 1000;
+	private static final int PUERTO = 10000;
     
     public static void main(String args[]) throws IOException {
-        HashMap<String, String> cacheHoroscopo = new HashMap<>();;
+        ConcurrentHashMap<String, String> cacheHoroscopo = new ConcurrentHashMap<>();
         ServerSocket ss;
         System.out.print("Inicializando servidor del horoscopo... ");
         try {
@@ -23,7 +24,7 @@ public class ServidorHoroscopo {
                 socket = ss.accept();
                 System.out.println("Nueva conexión entrante: "+socket);
                 //Creo un hilo y le envio un Runnable Servidor Menu
-				new Thread(new HiloHoroscopo(socket,idSession,cacheHoroscopo)).start();
+		new Thread(new HiloHoroscopo(socket,idSession,cacheHoroscopo)).start();
                 idSession++;
             }
         } catch (IOException ex) {
