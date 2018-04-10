@@ -20,7 +20,7 @@ import java.util.Date;
 
 public class Cliente {
 
-    private final static int PORT = 20000;
+    private final static int PORT = 30000;
     private final static String SERVER = "localhost";
 
     public static void main(String[] args) throws IOException, InterruptedException {
@@ -57,6 +57,8 @@ public class Cliente {
                         } else {
                             //Tenia una , la secuencia
                             //leo la respuesta del servidor
+                            salida = in.readUTF();
+                            System.out.println(salida);
                             salida = in.readUTF();
                             System.out.println(salida);
                         }

@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
@@ -26,12 +27,7 @@ import java.util.Random;
  */
 public class HiloClima implements Runnable {
 
-    @Override
-    public void run() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
- /* private HashMap<Date, String> cacheClima;
+    private ConcurrentHashMap<Date, String> cacheClima;
 
     private DataOutputStream out;
     private DataInputStream in;
@@ -41,7 +37,7 @@ public class HiloClima implements Runnable {
 
     private String[] clima = {"nublado", "soleado", "lluvia", "granizo", "supernova", "parcialmente nublado"};
 
-    public HiloClima(Socket socket, int idSession, HashMap<Date, String> cacheClima) {
+    public HiloClima(Socket socket, int idSession, ConcurrentHashMap<Date, String> cacheClima) {
 
         this.socket = socket;
         this.idSession = idSession;
@@ -64,9 +60,58 @@ public class HiloClima implements Runnable {
             in.close();
             socket.close();
         } catch (IOException ex) {
-            Logger.getLogger(ServidorHiloMenu.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("ioexecption");
+            //Logger.getLogger(ServidorHiloMenu.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
+    private String retornarClima(Date dFecha) {
+        String respuesta = cacheClima.get(dFecha);
+        if (respuesta == null) {
+            Random aleatorio = new Random();
+            int numero = aleatorio.nextInt(clima.length);
+            respuesta = clima[numero];
+            //Se cargan los valores de hash siempre en mayuscula
+            cacheClima.put(dFecha, respuesta);
+        }
+
+        return respuesta;
+    }
+
+    private Date transformarFecha(String fecha) {
+        Date dFecha;
+        SimpleDateFormat dt1 = new SimpleDateFormat("dd/MM/yyyy");
+        try {
+            dFecha = dt1.parse(fecha);
+        } catch (ParseException ex) {
+            return null;
+        }
+        return dFecha;
+    }
+
+    @Override
+    public void run() {
+        String fechaClima;
+        String resultado;
+        try {
+            Date fecha;
+            fechaClima = in.readUTF();
+            fecha = transformarFecha(fechaClima);
+            if (fecha != null) {
+                resultado = retornarClima(fecha);
+            } else {
+                resultado = "Formate de fecha no valido";
+            }
+            out.writeUTF(resultado);
+
+        } catch (IOException ex) {
+            Logger.getLogger(HiloClima.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+    }
+
+    /* 
+
+
 
     private boolean verificarExistencia(String horoscopo) {
         /* int longitud;
@@ -81,40 +126,9 @@ public class HiloClima implements Runnable {
         return true;
     }
 
-    private String retornarClima(Date dFecha) {
-        String respuesta = cacheClima.get(dFecha);
-        if (respuesta == null) {
-            Random aleatorio = new Random(clima.length);
-            int numero = aleatorio.nextInt();
-            respuesta = clima[numero];
-            //Se cargan los valores de hash siempre en mayuscula
-            cacheClima.add(dFecha, respuesta);
-        }
+  
+    
 
-        return respuesta;
-    }
 
-    private Date transformarFecha(String fecha) throws ParseException {
-        Date dFecha;
-        SimpleDateFormat dt1 = new SimpleDateFormat("dd/MM/yyyy");
-        dFecha = dt1.parse(fecha);
-        return dFecha;
-    }
-
-    @Override
-    public void run() {
-        String fechaClima;
-        try {
-            in.rea
-            fechaClima = in.readUTF();
-            //if (!verificarExistencia(horoscopo)){
-            //	out.writeUTF("El horoscopo no existe");
-            //}else{
-            //		out.writeUTF(retornarHoroscopo(horoscopo));
-            //	}
-        } catch (IOException ex) {
-            Logger.getLogger(HiloClima.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-*/
+     */
 }

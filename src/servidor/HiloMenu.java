@@ -102,7 +102,7 @@ public class HiloMenu implements Runnable {
         DataOutputStream outClima = null;
         DataInputStream inClima = null;
         try {
-            serverSocket = new Socket("localhost", 2000);
+            serverSocket = new Socket("localhost", 20000);
             outClima = new DataOutputStream(serverSocket.getOutputStream());
             inClima = new DataInputStream(serverSocket.getInputStream());
             //Le envio el horoscopo
@@ -175,10 +175,12 @@ public class HiloMenu implements Runnable {
                             //le envio la respuesta del servidor al cliente
                             resPronostico = inClima.readUTF();
                             out.writeUTF(resPronostico);
-                            cachePronostico.put(pronostico,resPronostico);
+                            cachePronostico.put(pronostico, resPronostico);
                         } else {
                             out.writeUTF("Fallo conexion con el servidor clima");
                         }
+                    } else {
+                        out.writeUTF(respuestaClima);
                     }
                     // listo = true;
                 } else if (lineaEntrada.equalsIgnoreCase("exit")) {
